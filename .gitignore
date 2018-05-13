@@ -1,0 +1,7 @@
+.idea/*
+!.idea/runConfigurations/
+*.iml
+.gradle
+/build
+out/
+local.properties
