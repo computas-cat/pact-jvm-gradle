@@ -4,3 +4,18 @@
  * This is a general purpose Gradle build.
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds/
  */
+
+plugins {
+    base
+    kotlin("jvm") version "1.2.41" apply false
+}
+
+allprojects {
+    group = "no.dervis"
+    version = "1.0"
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
