@@ -1,0 +1,10 @@
+plugins {
+    id "application"
+    id "java"
+}
+
+mainClassName = "no.dervis.java.app.Main"
+
+sourceCompatibility = 10
+
+apply from: "${rootDir}/testdeps.gradle"
