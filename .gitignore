@@ -2,7 +2,7 @@
 !.idea/runConfigurations/
 *.iml
 .gradle
-/build
+build/
 out/
 local.properties
 .DS_Store
