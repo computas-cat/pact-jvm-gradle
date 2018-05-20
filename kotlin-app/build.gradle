@@ -9,7 +9,9 @@ plugins {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-server-jetty:$ktor_version"
+    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
+
 }
 
 repositories {
@@ -32,4 +34,4 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-apply from: "${rootDir}/testdeps.gradle"
+apply from: "${rootDir}/common.gradle"
