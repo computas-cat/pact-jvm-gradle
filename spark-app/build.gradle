@@ -1,5 +1,5 @@
 buildscript {
-    ext.ktor_version = '0.9.2'
+    ext.kotlin_version = '1.2.41'
 }
 
 plugins {
@@ -8,17 +8,15 @@ plugins {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile "io.ktor:ktor-server-jetty:$ktor_version"
-    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
-
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "com.sparkjava:spark-kotlin:1.0.0-alpha"
 }
 
 repositories {
     maven { url = 'http://kotlin.bintray.com/ktor' }
 }
 
-mainClassName = "no.dervis.kotlin.app.Main"
+mainClassName = "no.dervis.spark.app.Main"
 
 kotlin {
     experimental {
