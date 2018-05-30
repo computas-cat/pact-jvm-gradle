@@ -3,7 +3,7 @@ package no.dervis.spark.app
 
 import spark.Spark.get
 
-data class User(val name: String, val email: String, val id: Int)
+data class ToDo(val done: Boolean, val email: String, val id: Int)
 
 
 // vararg args: String
