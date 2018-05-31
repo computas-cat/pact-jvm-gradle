@@ -12,10 +12,6 @@ dependencies {
     compile "com.sparkjava:spark-kotlin:1.0.0-alpha"
 }
 
-repositories {
-    maven { url = 'http://kotlin.bintray.com/ktor' }
-}
-
 mainClassName = "no.dervis.spark.app.Main"
 
 kotlin {
