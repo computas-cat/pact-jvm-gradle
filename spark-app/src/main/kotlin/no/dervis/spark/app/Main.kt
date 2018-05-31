@@ -3,7 +3,12 @@ package no.dervis.spark.app
 
 import spark.Spark.get
 
-data class ToDo(val done: Boolean, val email: String, val id: Int)
+data class ToDo(val id: Int, val description: String, val done: Boolean)
+
+class ToDos {
+    val list = mutableListOf<ToDo>()
+
+}
 
 
 // vararg args: String
