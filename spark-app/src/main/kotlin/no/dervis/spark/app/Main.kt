@@ -6,16 +6,21 @@ import org.eclipse.jetty.http.HttpStatus
 import spark.Spark.*
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
+val Id = AtomicInteger()
+
 object Json {
-    private val gson = GsonBuilder().setPrettyPrinting().create()
+    private val gson = GsonBuilder()
+            .registerTypeAdapter(ToDoItem::class.java, TodoDeserializer())
+            .registerTypeAdapter(Date::class.java, ISO8601Date())
+            .setPrettyPrinting()
+            .create()
     fun <T> fromJson(json: String, t: Class<T>): T = gson.fromJson(json, t)
     fun <T> toJson(t: T) = gson.toJson(t)
 }
-
-val Id = AtomicInteger()
 
 data class Error(val description: String, val error: Exception? = null)
 
@@ -37,6 +42,9 @@ data class ToDoList(
 fun main(args: Array<String>) {
     println("Starting ToDo Spark-app.")
     val todos = ToDoList(mutableListOf())
+
+    todos.add(ToDoItem(description = "Test1", done = false))
+    todos.add(ToDoItem(description = "Test2", done = false))
 
     path("/") {
         get("") { _, _ ->
