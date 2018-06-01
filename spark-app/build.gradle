@@ -10,6 +10,7 @@ plugins {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "com.sparkjava:spark-kotlin:1.0.0-alpha"
+    compile "com.google.code.gson:gson:2.8.5"
 }
 
 mainClassName = "no.dervis.spark.app.Main"
