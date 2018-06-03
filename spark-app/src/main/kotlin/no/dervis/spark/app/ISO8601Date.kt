@@ -9,7 +9,7 @@ import java.util.*
 
 class ISO8601Date : JsonDeserializer<Date>, JsonSerializer<Date> {
     override fun serialize(src: Date?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
-        return JsonPrimitive(ISO8601Utils.format(src))
+        return JsonPrimitive(ISO8601Utils.format(src, false, TimeZone.getDefault()))
     }
 
     override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): Date {

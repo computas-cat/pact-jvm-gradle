@@ -16,7 +16,7 @@ class TodoDeserializer : JsonDeserializer<ToDoItem> {
 
         val id = root.get("id")?.asInt ?: Id.getAndIncrement()
 
-        val description = root.get("description")?.asString ?: "My custom todo $id"
+        val title = root.get("title")?.asString ?: "My custom todo $id"
 
         val dueDateTime = Date.from(
                 LocalDateTime.parse(
@@ -24,6 +24,6 @@ class TodoDeserializer : JsonDeserializer<ToDoItem> {
                                 ?: LocalDateTime.now().toString()).atZone(ZoneId.systemDefault()).toInstant())
         val done = root.get("done")?.asBoolean ?: false
 
-        return ToDoItem(id, description, dueDateTime, done)
+        return ToDoItem(id, title, dueDateTime, done)
     }
 }

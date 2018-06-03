@@ -1,12 +1,15 @@
 @file:JvmName("Main")
 package no.dervis.spark.app
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.util.StdDateFormat
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.gson.GsonBuilder
 import org.eclipse.jetty.http.HttpStatus
 import spark.Spark.*
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -22,11 +25,11 @@ object Json {
     fun <T> toJson(t: T) = gson.toJson(t)
 }
 
-data class Error(val description: String, val error: Exception? = null)
+data class Error(val message: String, val error: Exception? = null)
 
 data class ToDoItem(
         val id: Int = Id.getAndIncrement(),
-        val description: String,
+        val title: String,
         val dueDateTime: Date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()),
         val done: Boolean)
 
@@ -42,9 +45,14 @@ data class ToDoList(
 fun main(args: Array<String>) {
     println("Starting ToDo Spark-app.")
     val todos = ToDoList(mutableListOf())
+    val jackson = jacksonObjectMapper()
+            .configure(SerializationFeature.INDENT_OUTPUT, true)
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, true)
+            .setDateFormat(StdDateFormat().withTimeZone(TimeZone.getDefault()))
 
-    todos.add(ToDoItem(description = "Test1", done = false))
-    todos.add(ToDoItem(description = "Test2", done = false))
+    todos.add(ToDoItem(title = "Test1", done = false))
+    todos.add(ToDoItem(title = "Test2", done = false))
 
     path("/") {
         get("") { _, _ ->
@@ -53,16 +61,16 @@ fun main(args: Array<String>) {
     }
 
     path("/todo") {
-        get("") {_, _ -> Json.toJson(todos) }
+        get("") {_, _ -> jackson.writeValueAsString(todos) }
 
         get("/:id") { request, response ->
-            val responseItem = todos.get(request.params(":id").toInt()) ?: Error(description = "Item was not found.")
+            val responseItem = todos.get(request.params(":id").toInt()) ?: Error(message = "Item was not found.")
             if (responseItem is Error) response.status(HttpStatus.NOT_FOUND_404)
-            Json.toJson(responseItem)
+            jackson.writeValueAsString(responseItem)
         }
 
         post("") { request, response ->
-            todos.add(Json.fromJson(request.body(), ToDoItem::class.java))
+            todos.add(jackson.readValue(request.body(), ToDoItem::class.java))
             response.status(201)
             "ok"
         }
