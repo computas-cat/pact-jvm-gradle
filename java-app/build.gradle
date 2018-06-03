@@ -5,6 +5,11 @@ plugins {
 
 mainClassName = "no.dervis.java.app.Main"
 
+dependencies {
+    compile "org.apache.httpcomponents:fluent-hc:4.5"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.9.5"
+}
+
 sourceCompatibility = 10
 
 apply from: "${rootDir}/common.gradle"
