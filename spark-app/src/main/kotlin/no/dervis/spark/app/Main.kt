@@ -38,8 +38,8 @@ data class ToDoList(
 
     fun get(id: Int): ToDoItem? = todoList.getOrNull(id)
     fun add(toDo: ToDoItem) = todoList.add(toDo)
-    //fun update(id: Int, toDo: ToDoItem) =
-
+    fun delete(id: Int) = todoList.removeAt(id)
+    fun update(toDo: ToDoItem) =  if (toDo.id >= 0) todoList.set(toDo.id, toDo) else throw IllegalArgumentException()
 }
 
 fun main(args: Array<String>) {
@@ -74,6 +74,18 @@ fun main(args: Array<String>) {
             response.status(201)
             "ok"
         }
+
+        put("") { request, response ->
+            val responseItem = jackson.readValue(request.body(), ToDoItem::class.java)
+            todos.update(responseItem)
+            response.status(200)
+            "Ok"
+        }
+
+        delete("/:id") { request, response ->
+            todos.delete(request.params(":id").toInt())
+            response.status(200)
+            "Ok"
+        }
     }
 }
-
