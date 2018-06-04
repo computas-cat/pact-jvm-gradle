@@ -25,7 +25,7 @@ object Json {
     fun <T> toJson(t: T) = gson.toJson(t)
 }
 
-data class Error(val message: String, val error: Exception? = null)
+data class Error(val message: String, val error: String? = "") { constructor() : this("") }
 
 data class ToDoItem(
         val id: Int = Id.getAndIncrement(),
@@ -39,7 +39,10 @@ data class ToDoList(
     fun get(id: Int): ToDoItem? = todoList.getOrNull(id)
     fun add(toDo: ToDoItem) = todoList.add(toDo)
     fun delete(id: Int) = todoList.removeAt(id)
-    fun update(toDo: ToDoItem) =  if (toDo.id >= 0) todoList.set(toDo.id, toDo) else throw IllegalArgumentException()
+    fun update(id: Int, toDo: ToDoItem) =  {
+        val oldTodo = get(id) ?: Error()
+        if (oldTodo is Error) throw IllegalArgumentException("Item with id $id was not found")
+    }
 }
 
 fun main(args: Array<String>) {
@@ -69,17 +72,32 @@ fun main(args: Array<String>) {
             jackson.writeValueAsString(responseItem)
         }
 
-        post("") { request, response ->
+        post("/") { request, response ->
             todos.add(jackson.readValue(request.body(), ToDoItem::class.java))
             response.status(201)
             "ok"
         }
 
-        put("") { request, response ->
-            val responseItem = jackson.readValue(request.body(), ToDoItem::class.java)
-            todos.update(responseItem)
-            response.status(200)
-            "Ok"
+        put("/:id") { request, response ->
+            val responseItem = try {
+                jackson.readValue(request.body(), ToDoItem::class.java)
+            }
+            catch (e: Exception) {
+                Error(message = "Invalid input.", error = e.message)
+            }
+
+            when (responseItem) {
+                is Error -> {
+                    response.status(HttpStatus.BAD_REQUEST_400)
+                    jackson.writeValueAsString(responseItem)
+                }
+                is ToDoItem -> {
+                    todos.update(request.params(":id").toInt(), responseItem)
+                    response.status(200)
+                    "Ok"
+                }
+                else -> throw IllegalStateException()
+            }
         }
 
         delete("/:id") { request, response ->
