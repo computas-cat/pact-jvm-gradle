@@ -1,4 +1,4 @@
-package no.dervis.spark.app
+package no.dervis.spark.app.gsonutils
 
 import com.google.gson.*
 import com.google.gson.internal.bind.util.ISO8601Utils

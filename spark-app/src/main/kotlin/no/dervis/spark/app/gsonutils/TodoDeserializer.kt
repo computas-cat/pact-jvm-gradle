@@ -1,9 +1,11 @@
-package no.dervis.spark.app
+package no.dervis.spark.app.gsonutils
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import no.dervis.spark.app.Id
+import no.dervis.spark.app.ToDoItem
 import java.lang.reflect.Type
 import java.time.LocalDateTime
 import java.time.ZoneId

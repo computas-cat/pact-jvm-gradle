@@ -2,10 +2,10 @@
 package no.dervis.spark.app
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.util.StdDateFormat
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.google.gson.GsonBuilder
 import org.eclipse.jetty.http.HttpStatus
 import spark.Spark.*
 import java.time.LocalDateTime
@@ -13,19 +13,8 @@ import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
+
 val Id = AtomicInteger()
-
-object Json {
-    private val gson = GsonBuilder()
-            .registerTypeAdapter(ToDoItem::class.java, TodoDeserializer())
-            .registerTypeAdapter(Date::class.java, ISO8601Date())
-            .setPrettyPrinting()
-            .create()
-    fun <T> fromJson(json: String, t: Class<T>): T = gson.fromJson(json, t)
-    fun <T> toJson(t: T) = gson.toJson(t)
-}
-
-data class Error(val message: String, val error: String? = "") { constructor() : this("") }
 
 data class ToDoItem(
         val id: Int = Id.getAndIncrement(),
@@ -33,15 +22,17 @@ data class ToDoItem(
         val dueDateTime: Date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()),
         val done: Boolean)
 
-data class ToDoList(
-        val todoList: MutableList<ToDoItem>) {
-
-    fun get(id: Int): ToDoItem? = todoList.getOrNull(id)
+data class ToDoList(val todoList: MutableList<ToDoItem>) {
+    private fun lookUpItem(id: Int): ToDoItem? = todoList.getOrNull(id)
+    fun get(id: Int): ToDoItem? = lookUpItem(id) ?: throw ItemNotFoundError(errorMessage = "Item was not found.")
     fun add(toDo: ToDoItem) = todoList.add(toDo)
     fun delete(id: Int) = todoList.removeAt(id)
-    fun update(id: Int, toDo: ToDoItem) =  {
-        val oldTodo = get(id) ?: Error()
-        if (oldTodo is Error) throw IllegalArgumentException("Item with id $id was not found")
+    fun update(id: Int, toDo: ToDoItem) {
+        val oldTodo = lookUpItem(id) ?: throw ItemNotFoundError("Item was not found.")
+        todoList[id] = oldTodo.copy(
+                title = toDo.title,
+                dueDateTime = toDo.dueDateTime,
+                done = toDo.done)
     }
 }
 
@@ -67,8 +58,7 @@ fun main(args: Array<String>) {
         get("") {_, _ -> jackson.writeValueAsString(todos) }
 
         get("/:id") { request, response ->
-            val responseItem = todos.get(request.params(":id").toInt()) ?: Error(message = "Item was not found.")
-            if (responseItem is Error) response.status(HttpStatus.NOT_FOUND_404)
+            val responseItem = todos.get(request.params(":id").toInt())
             jackson.writeValueAsString(responseItem)
         }
 
@@ -79,31 +69,27 @@ fun main(args: Array<String>) {
         }
 
         put("/:id") { request, response ->
-            val responseItem = try {
-                jackson.readValue(request.body(), ToDoItem::class.java)
-            }
-            catch (e: Exception) {
-                Error(message = "Invalid input.", error = e.message)
-            }
+            val responseItem = jackson.readValue(request.body(), ToDoItem::class.java)
 
-            when (responseItem) {
-                is Error -> {
-                    response.status(HttpStatus.BAD_REQUEST_400)
-                    jackson.writeValueAsString(responseItem)
-                }
-                is ToDoItem -> {
-                    todos.update(request.params(":id").toInt(), responseItem)
-                    response.status(200)
-                    "Ok"
-                }
-                else -> throw IllegalStateException()
-            }
+            todos.update(request.params(":id").toInt(), responseItem)
+            response.status(200)
+            "Ok"
         }
 
         delete("/:id") { request, response ->
             todos.delete(request.params(":id").toInt())
             response.status(200)
             "Ok"
+        }
+
+        exception(JsonMappingException::class.java) { exception, _, response ->
+            response.status(HttpStatus.BAD_REQUEST_400)
+            response.body(jackson.writeValueAsString(Error(errorMessage = "Invalid input", exception = exception)))
+        }
+
+        exception(ItemNotFoundError::class.java) { exception, _, response ->
+            response.status(HttpStatus.NOT_FOUND_404)
+            response.body(jackson.writeValueAsString(exception))
         }
     }
 }
