@@ -8,33 +8,10 @@ import com.fasterxml.jackson.databind.util.StdDateFormat
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.eclipse.jetty.http.HttpStatus
 import spark.Spark.*
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-
 val Id = AtomicInteger()
-
-data class ToDoItem(
-        val id: Int = Id.getAndIncrement(),
-        val title: String,
-        val dueDateTime: Date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()),
-        val done: Boolean)
-
-data class ToDoList(val todoList: MutableList<ToDoItem>) {
-    private fun lookUpItem(id: Int): ToDoItem? = todoList.getOrNull(id)
-    fun get(id: Int): ToDoItem? = lookUpItem(id) ?: throw ItemNotFoundError(errorMessage = "Item was not found.")
-    fun add(toDo: ToDoItem) = todoList.add(toDo)
-    fun delete(id: Int) = todoList.removeAt(id)
-    fun update(id: Int, toDo: ToDoItem) {
-        val oldTodo = lookUpItem(id) ?: throw ItemNotFoundError("Item was not found.")
-        todoList[id] = oldTodo.copy(
-                title = toDo.title,
-                dueDateTime = toDo.dueDateTime,
-                done = toDo.done)
-    }
-}
 
 fun main(args: Array<String>) {
     println("Starting ToDo Spark-app.")
