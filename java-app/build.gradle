@@ -1,7 +1,6 @@
 buildscript {
     ext {
         pactVersion = '3.5.17'
-        pactDirectory = "$buildDir" + File.separator + "pacts"
     }
 }
 
@@ -21,10 +20,6 @@ dependencies {
     testCompile "au.com.dius:pact-jvm-consumer-junit5_2.12:$pactVersion"
 }
 
-test {
-    systemProperties['pact.rootDir'] = file("$buildDir/pacts").absolutePath
-}
-
 pact {
     publish {
         pactBrokerUrl = 'http://localhost:3000'
@@ -36,16 +31,24 @@ pact {
 apply from: "${rootDir}/common.gradle"
 
 def pactFolderString = "$buildDir" + File.separator + "pacts"
+test.systemProperties["pact.rootDir"] = pactFolderString
+
 // Publish Pacts to Pact Broker
-if (file(pactFolderString).exists() &&
-        file("$buildDir/pacts").listFiles(new FilenameFilter() {
-            @Override
-            boolean accept(File dir, String name) {
-                def jsonfile = name.toLowerCase().endsWith(".json")
-                if (jsonfile) println "Found a Pact file: $name"
-                return jsonfile
-            }
-        })) build.finalizedBy(pactPublish)
-else {
-    println "$pactFolderString folder is empty or doesnt exist. Skipping Pact publish."
+
+pactPublish {
+    doFirst {
+        if (!file(pactFolderString).exists() ||
+                file("$buildDir/pacts").listFiles(new FilenameFilter() {
+                    @Override
+                    boolean accept(File dir, String name) {
+                        def jsonfile = name.toLowerCase().endsWith(".json")
+                        if (jsonfile) println "Found a Pact file: $name"
+                        return jsonfile
+                    }
+                }).length == 0) {
+            enabled = false
+        }
+    }
 }
+
+build.finalizedBy(pactPublish)
