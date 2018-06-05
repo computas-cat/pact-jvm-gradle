@@ -9,6 +9,5 @@
 
 rootProject.name = 'pact-jvmio'
 include 'spark-app'
-include 'ktor-app'
 include 'java-app'
 
