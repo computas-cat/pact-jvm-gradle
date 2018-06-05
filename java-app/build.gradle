@@ -1,15 +1,51 @@
+buildscript {
+    ext {
+        pactVersion = '3.5.17'
+        pactDirectory = "$buildDir" + File.separator + "pacts"
+    }
+}
+
 plugins {
     id "application"
     id "java"
+    id "au.com.dius.pact" version "3.5.17"
 }
 
 mainClassName = "no.dervis.java.app.Main"
+sourceCompatibility = 1.8
 
 dependencies {
     compile "org.apache.httpcomponents:fluent-hc:4.5"
     compile "com.fasterxml.jackson.core:jackson-databind:2.9.5"
+    testCompile "au.com.dius:pact-jvm-consumer-java8_2.12:$pactVersion"
+    testCompile "au.com.dius:pact-jvm-consumer-junit5_2.12:$pactVersion"
 }
 
-sourceCompatibility = 10
+test {
+    systemProperties['pact.rootDir'] = file("$buildDir/pacts").absolutePath
+}
+
+pact {
+    publish {
+        pactBrokerUrl = 'http://localhost:3000'
+        pactBrokerUsername = 'username'
+        pactBrokerPassword = 'password'
+    }
+}
 
 apply from: "${rootDir}/common.gradle"
+
+def pactFolderString = "$buildDir" + File.separator + "pacts"
+// Publish Pacts to Pact Broker
+if (file(pactFolderString).exists() &&
+        file("$buildDir/pacts").listFiles(new FilenameFilter() {
+            @Override
+            boolean accept(File dir, String name) {
+                def jsonfile = name.toLowerCase().endsWith(".json")
+                if (jsonfile) println "Found a Pact file: $name"
+                return jsonfile
+            }
+        })) build.finalizedBy(pactPublish)
+else {
+    println "$pactFolderString folder is empty or doesnt exist. Skipping Pact publish."
+}

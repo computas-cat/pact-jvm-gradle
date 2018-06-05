@@ -1,0 +1,24 @@
+
+plugins {
+    id "com.palantir.docker" version '0.19.2'
+    id "com.palantir.docker-compose" version '0.19.2'
+    id "com.palantir.docker-run" version '0.19.2'
+}
+
+dockerCompose {
+    template 'docker-compose-template.yml'
+    dockerComposeFile 'build/docker-compose.yml'
+}
+
+task clean {
+    doLast {
+        file("build").deleteDir()
+    }
+}
+
+task build(dependsOn: generateDockerCompose) {
+    doLast {
+        def name = systemProperties['MY_NAME']
+        println "Generating docker compose file. $name"
+    }
+}

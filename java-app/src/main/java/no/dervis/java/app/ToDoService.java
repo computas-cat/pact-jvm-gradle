@@ -1,6 +1,7 @@
 package no.dervis.java.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
@@ -14,7 +15,6 @@ public class ToDoService {
     private String host;
     private String endpoint = "/todo";
 
-
     public ToDoService(String host) {
         this.host = host;
     }
@@ -27,22 +27,69 @@ public class ToDoService {
         return todoList.getTodoList();
     }
 
-    public ToDo getToDos(ZonedDateTime from, ZonedDateTime to) {
-
-        return null;
-    }
-
-    public Response createTodo(ToDo toDo) {
+    public boolean updateTodo(ToDo toDo) {
         Response response = null;
+
         try {
-            response = Request.Post(host + endpoint).bodyString(
+            response = Request.Put(host + endpoint).bodyString(
                     new ObjectMapper().writeValueAsString(toDo), ContentType.APPLICATION_JSON
             ).execute();
+            int statusCode = response.returnResponse().getStatusLine().getStatusCode();
+
+            if (statusCode != HttpStatus.SC_OK) {
+                throw new RuntimeException(response.returnContent().asString());
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return response;
+        return true;
     }
 
+    public boolean createTodo(ToDo toDo) {
+        Response response = null;
+
+        try {
+            final ObjectMapper jackson = new ObjectMapper();
+            response = Request.Post(host + endpoint).bodyString(
+                    jackson.writeValueAsString(toDo), ContentType.APPLICATION_JSON
+            ).execute();
+
+            int statusCode = response.returnResponse().getStatusLine().getStatusCode();
+            String content = response.returnContent().asString();
+
+            if (statusCode != HttpStatus.SC_CREATED) {
+                throw new RuntimeException(content);
+            }
+
+            if (content != null && !content.isEmpty()) {
+                System.out.println(jackson.readValue(content, Entity.class));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    private class Entity {
+        private String uri;
+
+        public String getUri() {
+            return uri;
+        }
+
+        public void setUri(String uri) {
+            this.uri = uri;
+        }
+
+        @Override
+        public String toString() {
+            return "Entity{" +
+                    "uri='" + uri + '\'' +
+                    '}';
+        }
+    }
 }

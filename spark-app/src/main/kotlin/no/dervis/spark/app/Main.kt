@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.util.StdDateFormat
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.eclipse.jetty.http.HttpStatus
 import spark.Spark.*
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -20,7 +21,9 @@ fun main(args: Array<String>) {
             .configure(SerializationFeature.INDENT_OUTPUT, true)
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             .configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, true)
-            .setDateFormat(StdDateFormat().withTimeZone(TimeZone.getDefault()))
+            .setDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"))
+
+    val contentTypeJson = "application/json;charset=utf-8"
 
     todos.add(ToDoItem(title = "Test1", done = false))
     todos.add(ToDoItem(title = "Test2", done = false))
@@ -32,17 +35,23 @@ fun main(args: Array<String>) {
     }
 
     path("/todo") {
-        get("") {_, _ -> jackson.writeValueAsString(todos) }
+        get("") {_, response ->
+            response.type(contentTypeJson)
+            jackson.writeValueAsString(todos)
+        }
 
         get("/:id") { request, response ->
             val responseItem = todos.get(request.params(":id").toInt())
+            response.type(contentTypeJson)
             jackson.writeValueAsString(responseItem)
         }
 
         post("/") { request, response ->
-            todos.add(jackson.readValue(request.body(), ToDoItem::class.java))
+            val toDo = jackson.readValue(request.body(), ToDoItem::class.java)
+            todos.add(toDo)
             response.status(HttpStatus.CREATED_201)
-            "ok"
+            response.type(contentTypeJson)
+            jackson.writeValueAsString(Entity(uri = "/todo/${toDo.id}"))
         }
 
         put("/:id") { request, response ->
@@ -50,22 +59,24 @@ fun main(args: Array<String>) {
 
             todos.update(request.params(":id").toInt(), responseItem)
             response.status(HttpStatus.OK_200)
-            "Ok"
+            "ok"
         }
 
         delete("/:id") { request, response ->
             todos.delete(request.params(":id").toInt())
             response.status(HttpStatus.OK_200)
-            "Ok"
+            "ok"
         }
 
         exception(JsonMappingException::class.java) { exception, _, response ->
             response.status(HttpStatus.BAD_REQUEST_400)
+            response.type(contentTypeJson)
             response.body(jackson.writeValueAsString(Error(errorMessage = "Invalid input", exception = exception)))
         }
 
         exception(ItemNotFoundError::class.java) { exception, _, response ->
             response.status(HttpStatus.NOT_FOUND_404)
+            response.type(contentTypeJson)
             response.body(jackson.writeValueAsString(exception))
         }
     }
