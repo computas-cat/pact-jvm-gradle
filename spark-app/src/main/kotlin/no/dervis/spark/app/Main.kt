@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
 
         post("/") { request, response ->
             todos.add(jackson.readValue(request.body(), ToDoItem::class.java))
-            response.status(201)
+            response.status(HttpStatus.CREATED_201)
             "ok"
         }
 
@@ -49,13 +49,13 @@ fun main(args: Array<String>) {
             val responseItem = jackson.readValue(request.body(), ToDoItem::class.java)
 
             todos.update(request.params(":id").toInt(), responseItem)
-            response.status(200)
+            response.status(HttpStatus.OK_200)
             "Ok"
         }
 
         delete("/:id") { request, response ->
             todos.delete(request.params(":id").toInt())
-            response.status(200)
+            response.status(HttpStatus.OK_200)
             "Ok"
         }
 
