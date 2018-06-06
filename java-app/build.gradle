@@ -22,7 +22,9 @@ dependencies {
 
 pact {
     publish {
-        pactBrokerUrl = 'http://localhost:80'
+        pactBrokerUrl = "https://norwegianlga.pact.dius.com.au"
+        pactBrokerUsername = System.getenv('PACTBROKER_USERNAME')
+        pactBrokerPassword = System.getenv('PACTBROKER_PASSWORD')
     }
 }
 

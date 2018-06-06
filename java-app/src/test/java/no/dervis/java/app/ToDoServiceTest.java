@@ -6,12 +6,16 @@ import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.model.RequestResponsePact;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,14 +26,22 @@ public class ToDoServiceTest {
 
     private static final String TODO_API_URL = "/todo";
     private static final String CONSUMER = "java-app";
-    private static final String PROVIDER = "kotlin-app";
+    private static final String PROVIDER = "spark-app";
 
     @Pact(consumer = CONSUMER, provider = PROVIDER)
-    public RequestResponsePact hasTodoList(PactDslWithProvider builder) {
+    public RequestResponsePact hasTodoList(PactDslWithProvider builder) throws JsonProcessingException {
         Map<String, String> headers = Collections.singletonMap("Content-Type", "application/json; charset=UTF-8");
 
+        ObjectMapper jackson = new ObjectMapper();
+        ToDo toDo1 = new ToDo(9999, "State1", false, new Date());
+        ToDo toDo2 = new ToDo(9999, "State1_1", false, new Date());
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("todo1", jackson.writeValueAsString(toDo1));
+        params.put("todo1_1", jackson.writeValueAsString(toDo2));
+
         return builder
-                .given("a todo list exists")
+                .given("a todo list exists", params)
                 .uponReceiving("a request for a list of todo's")
                 .path(TODO_API_URL)
                 .method("GET")

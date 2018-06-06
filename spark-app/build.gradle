@@ -1,11 +1,19 @@
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext {
+        kotlin_version = '1.2.41'
+        pactVersion = '3.5.17'
+    }
 }
 
 plugins {
     id "application"
     id "org.jetbrains.kotlin.jvm" version "1.2.41"
+    id "au.com.dius.pact" version "3.5.17"
+    id "com.github.johnrengelman.processes" version "0.4.1"
+    id "com.wiredforcode.spawn" version "0.8.2"
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
 }
+
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
@@ -28,6 +36,52 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+import com.github.jengelman.gradle.plugins.processes.tasks.*
+
+task startProvider(type: Fork) {
+    executable "java"
+    args = ["-jar", "${shadowJar.archivePath}"]
+
+    doLast {
+        Thread.sleep(3000) // time to start
+    }
+}
+
+task stopProvider << {
+    startProvider.processHandle.abort()
+}
+
+def pactBrokerUsername = System.getenv('PACTBROKER_USERNAME')
+def pactBrokerPassword = System.getenv('PACTBROKER_PASSWORD')
+
+pact {
+    serviceProviders {
+        "spark-app" {
+
+            startProviderTask = startProvider
+            terminateProviderTask = stopProvider
+
+            hasPactsFromPactBroker('https://norwegianlga.pact.dius.com.au/',
+                    authentication: ['Basic', pactBrokerUsername, pactBrokerPassword]) {
+                stateChangeUsesBody = true
+                stateChangeTeardown = true
+                stateChange = { providerState, action ->
+                    if (action == 'setup') {
+
+                    } else {
+
+                    }
+                    false
+                }
+            }
+
+            if ('pactVerify' in gradle.startParameter.taskNames) {
+
+            }
+        }
+    }
 }
 
 apply from: "${rootDir}/common.gradle"

@@ -6,9 +6,6 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Hello World, from Java-App.");
-
-        new ToDoService("http://localhost:4567").getToDos();
-
     }
 
 }

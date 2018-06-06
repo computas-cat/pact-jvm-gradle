@@ -10,5 +10,4 @@
 rootProject.name = 'pact-jvmio'
 include 'spark-app'
 include 'java-app'
-include 'docker-app'
 
