@@ -18,7 +18,6 @@ task clean {
 
 task build(dependsOn: generateDockerCompose) {
     doLast {
-        def name = systemProperties['MY_NAME']
         println "Generating docker compose file. $name"
     }
 }

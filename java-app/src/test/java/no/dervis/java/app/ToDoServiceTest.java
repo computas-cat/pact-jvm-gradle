@@ -2,8 +2,6 @@ package no.dervis.java.app;
 
 import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.Pact;
-import au.com.dius.pact.consumer.dsl.PactDslJsonArray;
-import au.com.dius.pact.consumer.dsl.PactDslJsonRootValue;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
@@ -65,7 +63,7 @@ public class ToDoServiceTest {
 
         return builder
                 .given("todo list does not exists")
-                .uponReceiving("a request for a list of todo's")
+                .uponReceiving("a request for a todo in an empty todo list")
                 .path(TODO_API_URL)
                 .method("GET")
                 .willRespondWith()

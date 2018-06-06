@@ -22,9 +22,7 @@ dependencies {
 
 pact {
     publish {
-        pactBrokerUrl = 'http://localhost:3000'
-        pactBrokerUsername = 'username'
-        pactBrokerPassword = 'password'
+        pactBrokerUrl = 'http://localhost:80'
     }
 }
 
@@ -34,7 +32,6 @@ def pactFolderString = "$buildDir" + File.separator + "pacts"
 test.systemProperties["pact.rootDir"] = pactFolderString
 
 // Publish Pacts to Pact Broker
-
 pactPublish {
     doFirst {
         if (!file(pactFolderString).exists() ||
