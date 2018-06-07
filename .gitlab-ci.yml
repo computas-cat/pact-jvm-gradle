@@ -35,7 +35,7 @@ test:
   stage: test
   script:
     - gradle check
-    - pact/bin/pact-broker can-i-deploy --pacticipant="spark-app" --broker-base-url="https://norwegianlga.pact.dius.com.au/" -u=$PACTBROKER_USERNAME -p=$PACTBROKER_PASSWORD
+    - pact/bin/pact-broker can-i-deploy --pacticipant spark-app --latest --broker-base-url https://norwegianlga.pact.dius.com.au/ -u $PACTBROKER_USERNAME -p $PACTBROKER_PASSWORD
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull

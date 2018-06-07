@@ -28,6 +28,8 @@ public class ToDoServiceTest {
     /**
      *
      * A Todo-list exists
+     * Read the following thread to understand multiple expected
+     * interaction on one path: https://github.com/pact-foundation/pact-js/pull/95
      *
      */
 
