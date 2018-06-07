@@ -10,8 +10,15 @@ image: gradle:alpine
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
+stages:
+  - build
+  - test
+
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - curl -LO https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v1.44.3/pact-1.44.3-linux-x86_64.tar.gz
+  - tar xzf pact-1.44.3-linux-x86_64.tar.gz
+
 
 build:
   stage: build
@@ -23,10 +30,12 @@ build:
       - build
       - .gradle
 
-
+# https://gitlab.com/help/ci/examples/test-scala-application.md
 test:
   stage: test
-  script: gradle check
+  script:
+    - gradle check
+    - pact/bin/pact-broker can-i-deploy --pacticipant="spark-app" --broker-base-url="https://norwegianlga.pact.dius.com.au/" -u=$PACTBROKER_USERNAME -p=$PACTBROKER_PASSWORD
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
