@@ -41,6 +41,7 @@ fun main(args: Array<String>) {
         get("/:id") { request, response ->
             val responseItem = todos.get(request.params(":id").toInt())
             response.type(contentTypeJson)
+            response.status(HttpStatus.OK_200)
             jackson.writeValueAsString(responseItem)
         }
 

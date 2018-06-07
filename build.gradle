@@ -7,7 +7,6 @@
 
 allprojects {
     group = "no.dervis"
-    version = "1.0"
 
     repositories {
         mavenCentral()

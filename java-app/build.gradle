@@ -10,6 +10,7 @@ plugins {
     id "au.com.dius.pact" version "3.5.17"
 }
 
+version = "1.5"
 mainClassName = "no.dervis.java.app.Main"
 sourceCompatibility = 1.8
 

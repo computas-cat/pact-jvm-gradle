@@ -7,7 +7,6 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 public class ToDoService {
@@ -25,6 +24,14 @@ public class ToDoService {
         System.out.println(todoList);
 
         return todoList.getTodoList();
+    }
+
+    public ToDo getToDo(int id) throws IOException {
+        Response response = Request.Get(host + endpoint + "/" + id).execute();
+        ToDo todoItem = new ObjectMapper().readValue(response.returnContent().asString(), ToDo.class);
+        System.out.println(todoItem);
+
+        return todoItem;
     }
 
     public boolean updateTodo(ToDo toDo) {
