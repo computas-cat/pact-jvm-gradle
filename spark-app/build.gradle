@@ -57,29 +57,15 @@ def pactBrokerUsername = System.getenv('PACTBROKER_USERNAME')
 def pactBrokerPassword = System.getenv('PACTBROKER_PASSWORD')
 
 pact {
+
     serviceProviders {
         "spark-app" {
-
+            port = 4567
             startProviderTask = startProvider
             terminateProviderTask = stopProvider
 
             hasPactsFromPactBroker('https://norwegianlga.pact.dius.com.au/',
-                    authentication: ['Basic', pactBrokerUsername, pactBrokerPassword]) {
-                stateChangeUsesBody = true
-                stateChangeTeardown = true
-                stateChange = { providerState, action ->
-                    if (action == 'setup') {
-
-                    } else {
-
-                    }
-                    false
-                }
-            }
-
-            if ('pactVerify' in gradle.startParameter.taskNames) {
-
-            }
+                    authentication: ['Basic', pactBrokerUsername, pactBrokerPassword])
         }
     }
 }

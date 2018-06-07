@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
             .configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, true)
             .setDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"))
 
-    val contentTypeJson = "application/json;charset=utf-8"
+    val contentTypeJson = "application/json; charset=UTF-8"
 
     todos.add(ToDoItem(title = "Test1", done = false))
     todos.add(ToDoItem(title = "Test2", done = false))
