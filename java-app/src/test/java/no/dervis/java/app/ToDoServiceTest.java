@@ -51,7 +51,6 @@ public class ToDoServiceTest {
                             todo.stringType("title");
                             todo.date("dueDateTime", "yyyy-MM-dd'T'HH:mm:ssZZ");
                             todo.booleanType("done");
-                            todo.numberType("fooBar");
                         });
                     }).build())
                 .toPact();
