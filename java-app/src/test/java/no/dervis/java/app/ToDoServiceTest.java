@@ -46,11 +46,12 @@ public class ToDoServiceTest {
                     .status(200)
                     .headers(headers)
                     .body(newJsonBody(body -> {
-                        body.minArrayLike("todoList", 1, list -> {
-                            list.id();
-                            list.stringType("title");
-                            list.date("dueDateTime", "yyyy-MM-dd'T'HH:mm:ssZZ");
-                            list.booleanType("done");
+                        body.minArrayLike("todoList", 1, todo -> {
+                            todo.id();
+                            todo.stringType("title");
+                            todo.date("dueDateTime", "yyyy-MM-dd'T'HH:mm:ssZZ");
+                            todo.booleanType("done");
+                            todo.numberType("fooBar");
                         });
                     }).build())
                 .toPact();

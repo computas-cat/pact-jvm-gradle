@@ -1,7 +1,10 @@
 package no.dervis.java.app;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ToDo {
 
     private int id;
