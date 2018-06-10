@@ -4,6 +4,7 @@ package no.dervis.spark.app
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.eclipse.jetty.http.HttpStatus
 import spark.Spark.*
@@ -20,6 +21,7 @@ fun main(args: Array<String>) {
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             .configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, true)
             .setDateFormat(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"))
+            .registerModule(KotlinModule())
 
     val contentTypeJson = "application/json; charset=UTF-8"
 
@@ -45,12 +47,15 @@ fun main(args: Array<String>) {
             jackson.writeValueAsString(responseItem)
         }
 
-        post("/") { request, response ->
-            val toDo = jackson.readValue(request.body(), ToDoItem::class.java)
-            todos.add(toDo)
+        post("", "application/json") { request, response ->
+            println("""######${request.body()}""")
+            var toDo = jackson.readValue(request.body(), ToDoItem::class.java)
+            val newTodo = if (toDo.id != null) toDo else toDo.copy(id = Id.incrementAndGet())
+            todos.add(newTodo)
             response.status(HttpStatus.CREATED_201)
             response.type(contentTypeJson)
-            jackson.writeValueAsString(Entity(uri = "/todo/${toDo.id}"))
+            println("Added a new todo: $newTodo")
+            jackson.writeValueAsString(Entity(uri = "/todo/${newTodo.id}"))
         }
 
         put("/:id") { request, response ->

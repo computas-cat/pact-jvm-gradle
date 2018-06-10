@@ -1,10 +1,13 @@
 package no.dervis.java.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -54,49 +57,36 @@ public class ToDoService {
         return true;
     }
 
-    public boolean createTodo(ToDo toDo) {
+    public Entity createTodo(ToDo toDo) {
         Response response = null;
+        Entity entity = null;
 
         try {
             final ObjectMapper jackson = new ObjectMapper();
-            response = Request.Post(host + endpoint).bodyString(
-                    jackson.writeValueAsString(toDo), ContentType.APPLICATION_JSON
-            ).execute();
+            response = Request.Post(host + endpoint).body(new StringEntity(jackson.writeValueAsString(toDo),
+                    ContentType.APPLICATION_JSON))
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Accept", "application/json")
+                    .execute();
 
-            int statusCode = response.returnResponse().getStatusLine().getStatusCode();
-            String content = response.returnContent().asString();
+            HttpResponse httpResponse = response.returnResponse();
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            byte[] bytes = EntityUtils.toByteArray(httpResponse.getEntity());
+            String content = new String(bytes);
 
             if (statusCode != HttpStatus.SC_CREATED) {
                 throw new RuntimeException(content);
             }
 
-            if (content != null && !content.isEmpty()) {
-                System.out.println(jackson.readValue(content, Entity.class));
+            if (bytes != null && !content.isEmpty()) {
+                entity = jackson.readValue(content, Entity.class);
+                System.out.println(entity);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return true;
-    }
-
-    private class Entity {
-        private String uri;
-
-        public String getUri() {
-            return uri;
-        }
-
-        public void setUri(String uri) {
-            this.uri = uri;
-        }
-
-        @Override
-        public String toString() {
-            return "Entity{" +
-                    "uri='" + uri + '\'' +
-                    '}';
-        }
+        return entity;
     }
 }

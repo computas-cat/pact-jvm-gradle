@@ -7,7 +7,7 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ToDo {
 
-    private int id;
+    private Integer id;
 
     private String title;
 
@@ -17,17 +17,23 @@ public class ToDo {
 
     public ToDo() {  }
 
-    public ToDo(int id, String title, boolean done, Date dueDate) {
+    public ToDo(Integer id, String title, boolean done, Date dueDate) {
         this.id = id;
         this.title = title;
         this.done = done;
     }
 
-    public int getId() {
+    public ToDo(String title, boolean done, Date dueDateTime) {
+        this.title = title;
+        this.done = done;
+        this.dueDateTime = dueDateTime;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

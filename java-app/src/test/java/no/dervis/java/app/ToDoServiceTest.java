@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -104,6 +105,18 @@ public class ToDoServiceTest {
         Assertions.assertEquals(0, todoItem.getId());
         Assertions.assertEquals("Example", todoItem.getTitle());
         Assertions.assertFalse(todoItem.isDone());
+    }
+
+    @Test
+    void verifyCanCreateTodo(MockServer mockServer) throws IOException {
+        ToDoService toDoService = new ToDoService(mockServer.getUrl());
+
+        ToDo toDo = new ToDo("My new todo", false, new Date());
+
+        Entity entity = toDoService.createTodo(toDo);
+
+        Assertions.assertNotNull(entity);
+        Assertions.assertNull(entity.getUri());
     }
 
 }
