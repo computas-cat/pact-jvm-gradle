@@ -102,7 +102,7 @@ public class ToDoServiceTest {
         ToDo todoItem = toDoService.getToDo(0);
 
         Assertions.assertNotNull(todoItem);
-        Assertions.assertEquals(0, todoItem.getId());
+        Assertions.assertEquals(0, todoItem.getId().intValue());
         Assertions.assertEquals("Example", todoItem.getTitle());
         Assertions.assertFalse(todoItem.isDone());
     }
