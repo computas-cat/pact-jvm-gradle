@@ -107,16 +107,41 @@ public class ToDoServiceTest {
         Assertions.assertFalse(todoItem.isDone());
     }
 
+    @Pact(consumer = CONSUMER, provider = PROVIDER)
+    public RequestResponsePact canCreateTodo(PactDslWithProvider builder) {
+        Map<String, String> headers = Collections.singletonMap("Content-Type", "application/json;charset=utf-8");
+
+        return builder
+                .given("can create a new item")
+                .uponReceiving("a post request to create new item")
+                .path(String.format("%s", TODO_API_URL))
+                .method("POST")
+                .headers("Content-Type", "application/json", "Accept", "application/json")
+                .body(newJsonBody(body -> {
+                    body.stringType("title", "Example");
+                    body.date("dueDateTime", "yyyy-MM-dd'T'HH:mm:ssZZ");
+                    body.booleanType("done", false);
+                }).build())
+                .willRespondWith()
+                .status(201)
+                .headers(headers)
+                .body(newJsonBody(body -> {
+                    body.stringType("uri", "/todo/0");
+                    body.numberType("id", 0);
+                }).build())
+                .toPact();
+    }
+
     @Test
-    void verifyCanCreateTodo(MockServer mockServer) throws IOException {
+    @PactTestFor(pactMethod = "canCreateTodo")
+    void verifyCanCreateTodo(MockServer mockServer) {
         ToDoService toDoService = new ToDoService(mockServer.getUrl());
-
         ToDo toDo = new ToDo("My new todo", false, new Date());
-
         Entity entity = toDoService.createTodo(toDo);
 
         Assertions.assertNotNull(entity);
-        Assertions.assertNull(entity.getUri());
+        Assertions.assertNotNull(entity.getUri());
+        Assertions.assertEquals(0, entity.getId());
     }
 
 }

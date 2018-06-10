@@ -52,10 +52,10 @@ fun main(args: Array<String>) {
             var toDo = jackson.readValue(request.body(), ToDoItem::class.java)
             val newTodo = if (toDo.id != null) toDo else toDo.copy(id = Id.incrementAndGet())
             todos.add(newTodo)
-            response.status(HttpStatus.CREATED_201)
+            response.status(HttpStatus.OK_200)
             response.type(contentTypeJson)
             println("Added a new todo: $newTodo")
-            jackson.writeValueAsString(Entity(uri = "/todo/${newTodo.id}"))
+            jackson.writeValueAsString(Entity(uri = "/todo/${newTodo.id}", id = newTodo.id!!))
         }
 
         put("/:id") { request, response ->
