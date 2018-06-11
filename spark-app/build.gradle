@@ -22,7 +22,7 @@ dependencies {
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.5"
 }
 
-version = "1.0"
+version = "1.2"
 mainClassName = "no.dervis.spark.app.Main"
 
 kotlin {
