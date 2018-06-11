@@ -26,6 +26,7 @@ pact {
         pactBrokerUrl = "https://norwegianlga.pact.dius.com.au"
         pactBrokerUsername = System.getenv('PACTBROKER_USERNAME')
         pactBrokerPassword = System.getenv('PACTBROKER_PASSWORD')
+        tags = [System.getenv('ENV_TAG')]
     }
 }
 

@@ -21,6 +21,12 @@ public class ToDoService {
     private String host;
     private String endpoint = "/todo";
 
+    private final ObjectMapper jackson = new ObjectMapper()
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, true)
+            .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"));
+
     public ToDoService(String host) {
         this.host = host;
     }
@@ -35,7 +41,7 @@ public class ToDoService {
 
     public ToDo getToDo(int id) throws IOException {
         Response response = Request.Get(host + endpoint + "/" + id).execute();
-        ToDo todoItem = new ObjectMapper().readValue(response.returnContent().asString(), ToDo.class);
+        ToDo todoItem = jackson.readValue(response.returnContent().asString(), ToDo.class);
         System.out.println(todoItem);
 
         return todoItem;
@@ -46,7 +52,7 @@ public class ToDoService {
 
         try {
             response = Request.Put(host + endpoint).bodyString(
-                    new ObjectMapper().writeValueAsString(toDo), ContentType.APPLICATION_JSON
+                    jackson.writeValueAsString(toDo), ContentType.APPLICATION_JSON
             ).execute();
             int statusCode = response.returnResponse().getStatusLine().getStatusCode();
 
@@ -66,12 +72,6 @@ public class ToDoService {
         Entity entity = null;
 
         try {
-            final ObjectMapper jackson = new ObjectMapper()
-                    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                    .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                    .configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, true)
-                    .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ"));
-
             response = Request.Post(host + endpoint)
                     .body(new StringEntity(jackson.writeValueAsString(toDo), ContentType.APPLICATION_JSON))
                     .addHeader("Content-Type", "application/json")
