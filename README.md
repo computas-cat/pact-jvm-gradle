@@ -1,4 +1,4 @@
-# Pact-JVM.IO
+# Pact-JVM with Gradle and Kotlin 
 
 A simple Todo application with a consumer and a provider demonstrating Pact.
 
