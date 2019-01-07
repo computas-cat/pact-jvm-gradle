@@ -1,13 +1,13 @@
 buildscript {
     ext {
-        pactVersion = '3.5.17'
+        pactVersion = '3.6.1'
     }
 }
 
 plugins {
     id "application"
     id "java"
-    id "au.com.dius.pact" version "3.5.17"
+    id "au.com.dius.pact" version "3.6.1"
 }
 
 version = "1.5"
@@ -23,10 +23,10 @@ dependencies {
 
 pact {
     publish {
-        pactBrokerUrl = "https://norwegianlga.pact.dius.com.au"
+        pactBrokerUrl = "http://localhost/"
         pactBrokerUsername = System.getenv('PACTBROKER_USERNAME')
         pactBrokerPassword = System.getenv('PACTBROKER_PASSWORD')
-        tags = [System.getenv('ENV_TAG')]
+        // tags = [System.getenv('ENV_TAG')]
     }
 }
 
