@@ -21,12 +21,18 @@ dependencies {
     testCompile "au.com.dius:pact-jvm-consumer-junit5_2.12:$pactVersion"
 }
 
+def brokerUrl = System.getenv('PACTBROKER_URL') ? System.getenv('PACTBROKER_URL') :
+  "https://nav.pact.dius.com.au"
+def brokerUsername = System.getenv('PACTBROKER_USERNAME')
+def brokerPassword = System.getenv('PACTBROKER_PASSWORD')
+def buildTags = System.getenv('ENV_TAG') ? System.getenv('ENV_TAG') : 'DEV'
+
 pact {
     publish {
-        pactBrokerUrl = "http://localhost/"
-        pactBrokerUsername = System.getenv('PACTBROKER_USERNAME')
-        pactBrokerPassword = System.getenv('PACTBROKER_PASSWORD')
-        // tags = [System.getenv('ENV_TAG')]
+        pactBrokerUrl = brokerUrl
+        pactBrokerUsername = brokerUsername
+        pactBrokerPassword = brokerPassword
+        tags = [buildTags]
     }
 }
 
