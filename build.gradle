@@ -14,3 +14,5 @@ allprojects {
     }
 
 }
+
+// ext.systemProperty = systemProperty { prop, default -> System.getenv(prop) ? System.getenv(prop) : default }

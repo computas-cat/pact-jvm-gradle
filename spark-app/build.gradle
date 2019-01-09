@@ -54,8 +54,8 @@ task stopProvider {
 
 def pactBrokerUrl = System.getenv('PACTBROKER_URL') ? System.getenv('PACTBROKER_URL') :
   "https://nav.pact.dius.com.au"
-def pactBrokerUsername = System.getenv('PACTBROKER_USERNAME')
-def pactBrokerPassword = System.getenv('PACTBROKER_PASSWORD')
+def pactBrokerUsername = System.getenv('PACTBROKER_USERNAME') ? System.getenv('PACTBROKER_USERNAME') : ''
+def pactBrokerPassword = System.getenv('PACTBROKER_PASSWORD') ? System.getenv('PACTBROKER_PASSWORD') : ''
 
 pact {
 
